@@ -1,9 +1,12 @@
 # honygenerator
 224N NLP Project
 
+- [x] Tumblr Scraper 
 
-ToDo: 
-- Tumblr Scraper 
+todo 
 - Baseline Model 
-- Language Model Generator
-- Picture Keyword Tag generator 
+  - Markov Chain 
+  - RNN Basic Seq2Seq
+
+
+- Updated DQN and SeqGAN Architecture 
