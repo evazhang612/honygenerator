@@ -102,6 +102,7 @@ class RNNModel(nn.Module):
 
         # Instead, I'm feeding in the new word embeddings as "input" ---
         source_lengths = [len(s) for s in input] # I think this will give us sentence length but not sure
+        source_padded = self.vocab.src.to_input_tensor_char(input) # took out , device=self.device
         X = self.model_embeddings_source(source_padded)
         X_packed = pack_padded_sequence(X, source_lengths)
         input = X_packed # geenerates new word embeddings based on char encoder!!
