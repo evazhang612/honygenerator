@@ -7,17 +7,33 @@ from torch.autograd import Variable
 from embed_regularize import embedded_dropout
 from locked_dropout import LockedDropout
 from weight_drop import WeightDrop
+from vocab import Vocab, VocabEntry
+from model_embeddings import ModelEmbeddings
+from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nhidlast, nlayers, 
-                 dropout=0.5, dropouth=0.5, dropouti=0.5, dropoute=0.1, wdrop=0, 
+    def __init__(self, rnn_type, vocab, ntoken, ninp, nhid, nhidlast, nlayers,
+                 dropout=0.5, dropouth=0.5, dropouti=0.5, dropoute=0.1, wdrop=0,
                  tie_weights=False, ldropout=0.6, n_experts=10, num4embed=0, num4first=0, num4second=0):
+
+                 """
+                What parameters actually mean:
+                     model = model.RNNModel(args.model, vocab, ntokens, args.emsize, args.nhid, args.nhidlast, args.nlayers,
+                    args.dropout, args.dropouth, args.dropouti, args.dropoute, args.wdrop,
+                        args.tied, args.dropoutl, args.n_experts, args.num4embed, args.num4first, args.num4second)
+                    """
+
         super(RNNModel, self).__init__()
+
+        # generate CNN embeddings!! will be used in forward function. I also grab vocab from init -- #
+        self.model_embeddings_source = ModelEmbeddings(ninp, vocab.src)
+        # maddie's changes done ---
+
         self.lockdrop = LockedDropout()
         self.encoder = nn.Embedding(ntoken, ninp)
-        
+
         self.rnns = [torch.nn.LSTM(ninp if l == 0 else nhid, nhid if l != nlayers - 1 else nhidlast, 1, dropout=0) for l in range(nlayers)]
         if wdrop:
             self.rnns = [WeightDrop(rnn, ['weight_hh_l0'], dropout=wdrop) for rnn in self.rnns]
@@ -83,6 +99,13 @@ class RNNModel(nn.Module):
 
     def forward(self, input, hidden, return_h=False, return_prob=False):
         batch_size = input.size(1)
+
+        # Instead, I'm feeding in the new word embeddings as "input" ---
+        source_lengths = [len(s) for s in input] # I think this will give us sentence length but not sure
+        X = self.model_embeddings_source(source_padded)
+        X_packed = pack_padded_sequence(X, source_lengths)
+        input = X_packed # geenerates new word embeddings based on char encoder!!
+        # Maddie changes done---
 
         emb = embedded_dropout(self.encoder, input, dropout=self.dropoute if self.training else 0)
         #emb = self.idrop(emb)
@@ -163,4 +186,3 @@ if __name__ == '__main__':
     input = Variable(torch.LongTensor(13, 9).random_(0, 10))
     hidden = model.init_hidden(9)
     model(input, hidden)
-

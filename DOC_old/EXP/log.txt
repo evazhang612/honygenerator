@@ -1,0 +1,2 @@
+Args: Namespace(alpha=2, batch_size=20, beta=1, bptt=70, clip=0.25, continue_train=False, cuda=True, data='data/hony', dropout=0.4, dropoute=0.1, dropouth=0.3, dropouti=0.65, dropoutl=0.3, emsize=400, epochs=8000, log_interval=200, lr=30, max_seq_len_delta=40, model='LSTM', n_experts=10, nhid=1150, nhidlast=400, nlayers=3, nonmono=5, num4embed=0, num4first=0, num4second=0, save='EXP', seed=1111, single_gpu=False, small_batch_size=20, tied=True, var=0, wdecay=1.2e-06, wdrop=0.5)
+Model total parameters: 36604871

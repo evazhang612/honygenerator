@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+from vocab import Vocab, VocabEntry
 
 import gc
 
@@ -15,9 +16,12 @@ import model
 
 from utils import batchify, get_batch, repackage_hidden, create_exp_dir, save_checkpoint
 
+
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='./penn/',
                     help='location of the data corpus')
+parser.add_argument('--vocab', type=str, default='./vocab_hony.json',
+                    help='location of the data corpus') # maddie
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU, SRU)')
 parser.add_argument('--emsize', type=int, default=400,
@@ -86,9 +90,12 @@ parser.add_argument('--small_batch_size', type=int, default=-1,
                      until batch_size is reached. An update step is then performed.')
 parser.add_argument('--max_seq_len_delta', type=int, default=40,
                     help='max sequence length')
-parser.add_argument('--single_gpu', default=False, action='store_true', 
+parser.add_argument('--single_gpu', default=False, action='store_true',
                     help='use single GPU')
 args = parser.parse_args()
+
+
+
 
 if args.nhidlast < 0:
     args.nhidlast = args.emsize
@@ -138,8 +145,11 @@ ntokens = len(corpus.dictionary)
 if args.continue_train:
     model = torch.load(os.path.join(args.save, 'model.pt'))
 else:
-    model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid, args.nhidlast, args.nlayers, 
-                       args.dropout, args.dropouth, args.dropouti, args.dropoute, args.wdrop, 
+    # maddie - get vocab and put it in RNN model as a parameter
+    print("Loading Vocab")
+    vocab = Vocab.load(args.vocab) # vocab_hony
+    model = model.RNNModel(args.model, vocab, ntokens, args.emsize, args.nhid, args.nhidlast, args.nlayers,
+                       args.dropout, args.dropouth, args.dropouti, args.dropoute, args.wdrop,
                            args.tied, args.dropoutl, args.n_experts, args.num4embed, args.num4first, args.num4second)
 
 if args.cuda:

@@ -1,0 +1,9 @@
+python vocab.py --train-src=./data/hony/train.txt --train-tgt=./data/hony/train.txt vocab_hony.json
+
+^^ will generate vocab (note for simplicity sake, train-src = train-tgt because we aren't translating english to spanish... we just need the "src" embeddings to make the word embeddings so tgt can be anything.)
+
+
+This command should run on hony dataset using our vocab we generated:
+
+python main.py --data data/hony --vocab vocab_hony.json --dropouti 0.4 --dropoutl 0.6 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 500 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15 --num4second 5 --var 0.001 --nonmono 60 --save PTB
+

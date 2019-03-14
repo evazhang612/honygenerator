@@ -4,6 +4,8 @@ import torch
 from torch.autograd import Variable
 
 def embedded_dropout(embed, words, dropout=0.1, scale=None):
+    # called like this:
+    # embedded_dropout(self.encoder, input, dropout=self.dropoute if self.training else 0)
   if dropout:
     mask = embed.weight.data.new().resize_((embed.weight.size(0), 1)).bernoulli_(1 - dropout).expand_as(embed.weight) / (1 - dropout)
     mask = Variable(mask)
