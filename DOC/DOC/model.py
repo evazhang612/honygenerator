@@ -11,7 +11,7 @@ from weight_drop import WeightDrop
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nhidlast, nlayers, 
+    def __init__(self, vocab, rnn_type, ntoken, ninp, nhid, nhidlast, nlayers, 
                  dropout=0.5, dropouth=0.5, dropouti=0.5, dropoute=0.1, wdrop=0, 
                  tie_weights=False, ldropout=0.6, n_experts=10, num4embed=0, num4first=0, num4second=0):
         super(RNNModel, self).__init__()
